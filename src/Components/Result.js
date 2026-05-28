@@ -3,11 +3,7 @@ import CountUp from "react-countup";
 import ArrowButton from "./ArrowButton";
 
 const Result = ({
-  inputDay,
-  inputMonth,
-  inputYear,
-  inputHour,
-  inputMinute,
+  userInput,
   curDate,
   curYear,
   leapYars,
@@ -15,6 +11,12 @@ const Result = ({
   setDisplayed,
 }) => {
   const { t, i18n } = useTranslation();
+
+  const inputDay = userInput.day,
+    inputMonth = userInput.month,
+    inputYear = userInput.year,
+    inputHour = userInput.hour,
+    inputMinute = userInput.minute;
 
   const curMonth = curDate.getMonth() + 1, //number of month starting from 1
     curDay = curDate.getDate(),
@@ -46,13 +48,10 @@ const Result = ({
     switch (true) {
       case [4, 6, 9, 11].includes(prevMonth):
         return 30;
-        break;
-      case prevMonth == 2 && leapYars.includes(Number(curYear)):
+      case prevMonth === 2 && leapYars.includes(Number(curYear)):
         return 29;
-        break;
-      case prevMonth == 2:
+      case prevMonth === 2:
         return 28;
-        break;
       default:
         return 31;
     }
@@ -112,16 +111,15 @@ const Result = ({
   const nextBDate = () => {
     switch (true) {
       case curMonth > inputMonth ||
-        (curMonth == inputMonth && curDay > inputDay):
+        (curMonth === inputMonth && curDay > inputDay):
         return new Date(`${inputMonth}, ${inputDay}, ${curYear + 1}`);
-        break;
       case curMonth < inputMonth ||
-        (curMonth == inputMonth && curDay < inputDay):
+        (curMonth === inputMonth && curDay < inputDay):
         return new Date(`${inputMonth}, ${inputDay}, ${curYear}`);
-        break;
-      case curMonth == inputMonth && curDay == inputDay:
+      case curMonth === inputMonth && curDay === inputDay:
         return 0;
-        break;
+      default:
+        return 0;
     }
   };
 

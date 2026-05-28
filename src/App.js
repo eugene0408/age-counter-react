@@ -8,9 +8,9 @@ import engIcon from "./img/eng.svg";
 import ukrIcon from "./img/ukr.svg";
 import czeIcon from "./img/czech.svg";
 // Components
-import InputForm from "./Components/InputForm";
-import Result from "./Components/Result";
-import About from "./Components/About";
+import InputForm from "./components/InputForm";
+import Result from "./components/Result";
+import About from "./components/About";
 import "./Fonts.css";
 import "./App.css";
 
@@ -19,7 +19,7 @@ function App() {
   const defaultDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
   const [theme, setTheme] = useLocalStorage(
     "theme",
-    defaultDark ? "dark" : "light"
+    defaultDark ? "dark" : "light",
   );
 
   const switchTheme = () => {
@@ -30,37 +30,29 @@ function App() {
   // States
   const [displayed, setDisplayed] = useState("input"); //display input/result
   const [aboutButton, setAboutButton] = useState(true);
-  const [inputDay, setInputDay] = useState();
-  const [inputMonth, setInputMonth] = useState();
-  const [inputYear, setInputYear] = useState();
-  const [inputHour, setInputHour] = useState();
-  const [inputMinute, setInputMinute] = useState();
+  // User input in form
+  const [userInput, setUserInput] = useState({
+    day: 1,
+    month: 1,
+    year: 1900,
+    hour: "00",
+    minute: "00",
+  });
+  // User input converted in date format
   const [inputDate, setInputDate] = useState();
 
   const curDate = new Date();
   const curYear = curDate.getFullYear();
 
   // Save data to local storage
-  const [saveDay, setSaveDay] = useLocalStorage("day", null);
-  const [saveMonth, setSaveMonth] = useLocalStorage("month", null);
-  const [saveYear, setSaveYear] = useLocalStorage("year", null);
-  const [saveHour, setSaveHour] = useLocalStorage("hour", null);
-  const [saveMinute, setSaveMinute] = useLocalStorage("minute", null);
+  const [saveUserInput, setSaveUserInput] = useLocalStorage("userInput", null);
 
   useEffect(() => {
-    setSaveDay(inputDay);
-    setSaveMonth(inputMonth);
-    setSaveYear(inputYear);
-    setSaveHour(inputHour);
-    setSaveMinute(inputMinute);
-  }, [inputDay, inputMonth, inputYear, inputHour, inputMinute]);
+    setSaveUserInput(userInput);
+  }, [userInput]);
 
   useEffect(() => {
-    saveDay ? setInputDay(saveDay) : setInputDay(1);
-    saveMonth ? setInputMonth(saveMonth) : setInputMonth(1);
-    saveYear ? setInputYear(saveYear) : setInputYear(1900);
-    saveHour ? setInputHour(saveHour) : setInputHour("00");
-    saveMinute ? setInputMinute(saveMinute) : setInputMinute("00");
+    saveUserInput ? setUserInput(saveUserInput) : setUserInput(userInput);
   }, []);
 
   // Leap years
@@ -96,26 +88,9 @@ function App() {
 
       {displayed === "input" && (
         <InputForm
-          inputDay={inputDay}
-          setInputDay={setInputDay}
-          inputMonth={inputMonth}
-          setInputMonth={setInputMonth}
-          inputYear={inputYear}
-          setInputYear={setInputYear}
-          inputHour={inputHour}
-          setInputHour={setInputHour}
-          inputMinute={inputMinute}
-          setInputMinute={setInputMinute}
-          saveDay={saveDay}
-          setSaveDay={setSaveDay}
-          saveMonth={saveMonth}
-          setSaveMonth={setSaveMonth}
-          saveYear={saveYear}
-          setSaveYear={setSaveYear}
-          saveHour={saveHour}
-          setSaveHour={setSaveHour}
-          saveMinute={saveMinute}
-          setSaveMinute={setSaveMinute}
+          userInput={userInput}
+          setUserInput={setUserInput}
+          saveUserInput={saveUserInput}
           curDate={curDate}
           curYear={curYear}
           leapYars={leapYars}
@@ -128,11 +103,7 @@ function App() {
 
       {displayed === "result" && (
         <Result
-          inputDay={inputDay}
-          inputMonth={inputMonth}
-          inputYear={inputYear}
-          inputHour={inputHour}
-          inputMinute={inputMinute}
+          userInput={userInput}
           curDate={curDate}
           curYear={curYear}
           leapYars={leapYars}
@@ -155,7 +126,7 @@ function App() {
 }
 
 const LangSelect = () => {
-  const { t, i18n } = useTranslation();
+  const { i18n } = useTranslation();
 
   const changeLanguage = (lng) => {
     i18n.changeLanguage(lng);
@@ -184,6 +155,9 @@ const LangSelect = () => {
 
       case ["cs"].includes(i18n.language):
         return { backgroundImage: `url(${czeIcon})` };
+
+      default:
+        return { backgroundImage: `url(${engIcon})` };
     }
   };
 

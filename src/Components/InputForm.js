@@ -4,27 +4,16 @@ import { useTranslation } from "react-i18next";
 import ArrowButton from "./ArrowButton";
 
 const InputForm = ({
-  inputDay,
-  setInputDay,
-  inputMonth,
-  setInputMonth,
-  inputYear,
-  setInputYear,
-  inputHour,
-  setInputHour,
-  inputMinute,
-  setInputMinute,
-  saveDay,
-  saveYear,
-  saveHour,
-  saveMinute,
+  userInput,
+  setUserInput,
+  saveUserInput,
   curDate,
   curYear,
   leapYars,
   setInputDate,
   setDisplayed,
 }) => {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
 
   // States
   const [inputDayClassName, setInputDayClassName] = useState("date-input");
@@ -34,11 +23,26 @@ const InputForm = ({
   // Effect
   useEffect(() => {
     changeDateHandler();
-  }, [inputMonth, inputYear]);
+  }, [userInput]);
 
   useEffect(() => {
     checkMaxDays();
-  }, [maxDays, inputDay]);
+  }, [maxDays, userInput]);
+
+  const inputDay = userInput.day,
+    inputMonth = userInput.month,
+    inputYear = userInput.year,
+    inputHour = userInput.hour,
+    inputMinute = userInput.minute;
+
+  const saveDay = saveUserInput.day,
+    saveYear = saveUserInput.year,
+    saveHour = saveUserInput.hour,
+    saveMinute = saveUserInput.minute;
+
+  const setUserInputProp = (prop, value) => {
+    setUserInput({ ...userInput, [prop]: value });
+  };
 
   // Months list for react-select
   const months = [
@@ -97,10 +101,10 @@ const InputForm = ({
       case [4, 6, 9, 11].includes(inputMonth):
         setMaxDays(30);
         break;
-      case inputMonth == 2 && leapYars.includes(Number(inputYear)):
+      case inputMonth === 2 && leapYars.includes(Number(inputYear)):
         setMaxDays(29);
         break;
-      case inputMonth == 2:
+      case inputMonth === 2:
         setMaxDays(28);
         break;
       default:
@@ -115,23 +119,25 @@ const InputForm = ({
         case e.target.value > max:
           e.target.value = max;
           break;
-        case e.target.value == "" ||
+        case e.target.value === "" ||
           e.target.value == null ||
-          e.target.value == undefined ||
+          e.target.value === undefined ||
           isNaN(e.target.value):
           e.target.value = saved;
           break;
         case e.target.value < min:
           e.target.value = min;
           break;
+        default:
+          return;
       }
 
-      if (max == curYear) {
-        setInputYear(e.target.value);
+      if (max === curYear) {
+        setUserInputProp("year", e.target.value);
       }
 
-      if (max == 31) {
-        setInputDay(e.target.value);
+      if (max === 31) {
+        setUserInputProp("day", e.target.value);
       }
     };
   };
@@ -145,23 +151,25 @@ const InputForm = ({
         case e.target.value > max:
           e.target.value = max;
           break;
-        case e.target.value == "" ||
+        case e.target.value === "" ||
           isNaN(e.target.value) ||
-          e.target.value == undefined ||
+          e.target.value === undefined ||
           e.target.value == null:
           e.target.value = saved;
           break;
         case e.target.value < 0:
           e.target.value = "00";
           break;
+        default:
+          return;
       }
 
-      if (max == 23) {
-        setInputHour(e.target.value);
+      if (max === 23) {
+        setUserInputProp("hour", e.target.value);
       }
 
-      if (max == 59) {
-        setInputMinute(e.target.value);
+      if (max === 59) {
+        setUserInputProp("minute", e.target.value);
       }
     };
   };
@@ -186,7 +194,7 @@ const InputForm = ({
     e.preventDefault();
     // Set input values to date
     let usrDate = new Date(
-      `${inputMonth},${inputDay},${inputYear},${inputHour}:${inputMinute}`
+      `${inputMonth},${inputDay},${inputYear},${inputHour}:${inputMinute}`,
     );
     setInputDate(usrDate);
 
@@ -210,7 +218,7 @@ const InputForm = ({
             label={t("form.day")}
             className={inputDayClassName}
             value={inputDay}
-            onChange={(e) => setInputDay(e.target.value)}
+            onChange={(e) => setUserInputProp("day", e.target.value)}
             onFocus={clearValue}
             onBlur={inputDateHandler(1, 31, saveDay)}
           />
@@ -223,7 +231,7 @@ const InputForm = ({
               styles={selectStyles}
               value={months[inputMonth - 1]}
               onChange={(e) => {
-                setInputMonth(Number(e.value));
+                setUserInputProp("month", Number(e.value));
               }}
             />
           </div>
@@ -233,7 +241,7 @@ const InputForm = ({
             className={inputYearClassName}
             value={inputYear}
             onChange={(e) => {
-              setInputYear(e.target.value);
+              setUserInputProp("year", e.target.value);
               setInputYearClassName("date-input");
             }}
             onFocus={clearValue}
@@ -254,7 +262,7 @@ const InputForm = ({
             label={t("form.hour")}
             className="time-input"
             value={inputHour}
-            onChange={(e) => setInputHour(e.target.value)}
+            onChange={(e) => setUserInputProp("hour", e.target.value)}
             onFocus={clearValue}
             onBlur={inputTimeHandler(23, saveHour)}
           />
@@ -267,7 +275,7 @@ const InputForm = ({
             label={t("form.minute")}
             className="time-input"
             value={inputMinute}
-            onChange={(e) => setInputMinute(e.target.value)}
+            onChange={(e) => setUserInputProp("minute", e.target.value)}
             onFocus={clearValue}
             onBlur={inputTimeHandler(59, saveMinute)}
           />
